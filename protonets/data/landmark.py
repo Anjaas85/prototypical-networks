@@ -14,6 +14,7 @@ from protonets.data.base import convert_dict, CudaTransform, EpisodicBatchSample
 LANDMARK_DATA_DIR = '/content/drive/MyDrive/landmark_dataset'
 LANDMARK_CACHE = {}
 
+
 def load_image_path(key, out_field, d):
     d[out_field] = Image.open(d[key]).convert('RGB')  # Force RGB for consistency
     return d
