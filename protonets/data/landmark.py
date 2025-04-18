@@ -11,7 +11,7 @@ from torchnet.transform import compose
 import protonets
 from protonets.data.base import convert_dict, CudaTransform, EpisodicBatchSampler, SequentialBatchSampler
 from protonets.data.omniglot import extract_episode
-from protonets.data.base import BalancedEpisodicSampler
+#from protonets.data.base import BalancedEpisodicSampler
 
 LANDMARK_DATA_DIR = '/content/drive/MyDrive/landmark_dataset'
 LANDMARK_CACHE = {}
@@ -78,46 +78,49 @@ def load_class_images(d):
 
 # Keep the rest similar to omniglot.py but adjust parameters:
 def load(opt, splits):
-    split_dir = os.path.join(LANDMARK_DATA_DIR, opt['data.split']) 
-
+    split_dir = os.path.join(LANDMARK_DATA_DIR, 'splits') 
+    print('aaaaaaaaaaaaaaaaaa')
     ret = {}
     for split in splits:
-        # Use similar logic but adjust parameters:
-        n_way = opt['data.way'] if split == 'train' else opt['data.test_way']
-        n_support = opt['data.shot']
-        n_query = opt['data.query']
-        n_episodes = opt['data.train_episodes'] if split == 'train' else opt['data.test_episodes']
+      print(split)
+      # Use similar logic but adjust parameters:
+      n_way = opt['data.way'] if split == 'train' else opt['data.test_way']
+      n_support = opt['data.shot']        
+      n_query = opt['data.query']
+      n_episodes = opt['data.train_episodes'] if split == 'train' else opt['data.test_episodes']
 
-        transforms = [
-            partial(convert_dict, 'class'),
-            load_class_images,
-            partial(extract_episode, n_support, n_query)
+      transforms = [
+          partial(convert_dict, 'class'),
+          load_class_images,
+          partial(extract_episode, n_support, n_query)
         ]
         
-        if opt['data.cuda']:
-            transforms.append(CudaTransform())
+      if opt['data.cuda']:
+          transforms.append(CudaTransform())
 
-        transforms = compose(transforms)
+      transforms = compose(transforms)
 
-        class_names = []
-        class_paths = []
-        min_samples = opt['data.shot'] + opt['data.query']
+      class_names = []
+      class_paths = []
+      min_samples = opt['data.shot'] + opt['data.query']
 
-        with open(os.path.join(split_dir, f"{split}.txt"), 'r') as f:
-          for cls in f.readlines():
-            cls = cls.strip()
-            cls_path = os.path.join(LANDMARK_DATA_DIR, 'data', cls)
-            if len(os.listdir(cls_path)) >= min_samples:
-              class_names.append(cls)
-              class_paths.append(cls_path)
-        
+      with open(os.path.join(split_dir, f"{split}.txt"), 'r') as f:
+        for cls in f.readlines():
+          cls = cls.strip()
+          cls_path = os.path.join(LANDMARK_DATA_DIR, 'data', cls)
+          print(cls_path)
+          if len(os.listdir(cls_path)) >= min_samples:
+            class_names.append(cls)
+            class_paths.append(cls_path)
 
+      print(class_names)
 
-        ds = TransformDataset(ListDataset(class_names), transforms)
+      ds = TransformDataset(ListDataset(class_names), transforms)
 
-        #sampler = EpisodicBatchSampler(len(ds), n_way, n_episodes)
-        sampler = BalancedEpisodicSampler(class_paths = class_paths, n_way = n_way, n_episodes = n_episodes)
-        ret[split] = torch.utils.data.DataLoader(ds, batch_sampler=sampler, num_workers=2, pin_memory=opt['data.cuda'])
+      sampler = EpisodicBatchSampler(len(ds), n_way, n_episodes)
+      print(class_paths)
+      #sampler = BalancedEpisodicSampler(class_paths = class_paths, n_way = n_way, n_episodes = n_episodes)
+      ret[split] = torch.utils.data.DataLoader(ds, batch_sampler=sampler, num_workers=2, pin_memory=opt['data.cuda'])
 
     return ret
 

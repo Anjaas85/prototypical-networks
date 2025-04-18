@@ -40,7 +40,7 @@ class EpisodicBatchSampler(object):
 
 
 
-
+'''
 class BalancedEpisodicSampler(EpisodicBatchSampler):
     def __init__(self, class_paths, n_way, n_episodes):  # MODIFIED INIT
         self.class_paths = class_paths
@@ -53,3 +53,4 @@ class BalancedEpisodicSampler(EpisodicBatchSampler):
         
         for _ in range(self.n_episodes):
             yield torch.multinomial(weights, self.n_way, replacement=False)
+'''

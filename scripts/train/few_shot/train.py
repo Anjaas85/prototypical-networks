@@ -17,6 +17,8 @@ import protonets.utils.data as data_utils
 import protonets.utils.model as model_utils
 import protonets.utils.log as log_utils
 
+#from protonets.data.base import BalancedEpisodicSampler
+
 def main(opt):
     if not os.path.isdir(opt['log.exp_dir']):
         os.makedirs(opt['log.exp_dir'])
