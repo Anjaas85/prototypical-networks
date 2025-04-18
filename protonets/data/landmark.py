@@ -10,6 +10,8 @@ from torchnet.dataset import ListDataset, TransformDataset
 from torchnet.transform import compose
 import protonets
 from protonets.data.base import convert_dict, CudaTransform, EpisodicBatchSampler, SequentialBatchSampler
+from protonets.data.omniglot import extract_episode
+from protonets.data.base import BalancedEpisodicSampler
 
 LANDMARK_DATA_DIR = '/content/drive/MyDrive/landmark_dataset'
 LANDMARK_CACHE = {}
@@ -76,7 +78,7 @@ def load_class_images(d):
 
 # Keep the rest similar to omniglot.py but adjust parameters:
 def load(opt, splits):
-    split_dir = os.path.join(LANDMARK_DATA_DIR, 'splits', opt['data.split']) 
+    split_dir = os.path.join(LANDMARK_DATA_DIR, opt['data.split']) 
 
     ret = {}
     for split in splits:
